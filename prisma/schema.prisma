@@ -1,0 +1,71 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SocialType {
+  GOOGLE
+  FACEBOOK
+}
+
+model User {
+  id           String        @id @default(cuid())
+  socialUserId String        @unique @map("social_user_id")
+  socialType   SocialType    @default(GOOGLE) @map("social_type")
+  email        String        @unique
+  name         String
+  birthday     DateTime
+  avatar       String?
+  deleted      Boolean       @default(false)
+  UserAllergy  UserAllergy[]
+
+  createdAt       DateTime          @default(now()) @map("created-at")
+  updatedAt       DateTime          @updatedAt @map("updated-at")
+  UserFoodProfile UserFoodProfile[]
+
+  @@map("users")
+}
+
+model Allergy {
+  id          String        @id @default(cuid())
+  name        String        @unique
+  UserAllergy UserAllergy[]
+
+  @@map("allergies")
+}
+
+model FoodProfile {
+  id              String            @id @default(cuid())
+  name            String            @unique
+  UserFoodProfile UserFoodProfile[]
+
+  @@map("food_profiles")
+}
+
+model UserAllergy {
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String  @map("user_id")
+  allergy   Allergy @relation(fields: [allergyId], references: [id])
+  allergyId String  @map("allergy_id")
+
+  @@id([userId, allergyId])
+  @@map("user_allergies")
+}
+
+model UserFoodProfile {
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId        String      @map("user_id")
+  foodProfile   FoodProfile @relation(fields: [foodProfileId], references: [id])
+  foodProfileId String      @map("food_profile_id")
+
+  @@id([userId, foodProfileId])
+  @@map("user_food_profiles")
+}
