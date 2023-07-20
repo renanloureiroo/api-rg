@@ -6,8 +6,8 @@ import {
   Conflict,
 } from '../../../../shared/errors/implementations';
 import {
-  IAllergiesRepository,
-  IFoodProfilesRepository,
+  IAccountAllergiesRepository,
+  IAccountFoodProfilesRepository,
   IAccountsRepository,
 } from '../../repositories';
 
@@ -16,16 +16,22 @@ class CreateAccountUseCase {
   constructor(
     @inject('AccountsRepository')
     private readonly accountsRepository: IAccountsRepository,
-    @inject('AllergiesRepository')
-    private readonly allergiesRepository: IAllergiesRepository,
-    @inject('FoodProfilesRepository')
-    private readonly foodProfilesRepository: IFoodProfilesRepository
+    @inject('AccountAllergiesRepository')
+    private readonly accountAllergiesRepository: IAccountAllergiesRepository,
+    @inject('AccountFoodProfilesRepository')
+    private readonly accountFoodProfilesRepository: IAccountFoodProfilesRepository
   ) {}
   async execute(data: ICreateAccountDTO): Promise<void> {
     try {
       const accountAlreadyExists = await this.accountsRepository.findByEmail(
         data.email
       );
+
+      const accountAlreadyExistsWithSameSocialProvider =
+        accountAlreadyExists &&
+        data.socialUserId === accountAlreadyExists.socialUserId;
+
+      if (accountAlreadyExistsWithSameSocialProvider) return;
 
       if (accountAlreadyExists) {
         throw new Conflict('E-mail already used!');
@@ -34,7 +40,7 @@ class CreateAccountUseCase {
       const account = await this.accountsRepository.create(data);
 
       if (data.userAllergies) {
-        await this.allergiesRepository.createMany({
+        await this.accountAllergiesRepository.createMany({
           data: data.userAllergies.map((allergyId) => ({
             userId: account.id,
             allergyId,
@@ -43,7 +49,7 @@ class CreateAccountUseCase {
       }
 
       if (data.userFoodProfiles) {
-        await this.foodProfilesRepository.createMany({
+        await this.accountFoodProfilesRepository.createMany({
           data: data.userFoodProfiles.map((foodProfileId) => ({
             userId: account.id,
             foodProfileId,

@@ -1,3 +1,3 @@
 export * from './IAccountsRepository';
-export * from './IAllergiesRepository';
-export * from './IFoofProfilesRepository';
+export * from './IAccountAllergiesRepository';
+export * from './IAccountFoodProfilesRepository';

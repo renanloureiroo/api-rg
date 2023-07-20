@@ -1,4 +1,4 @@
-import { inject } from 'tsyringe';
+import { inject, injectable } from 'tsyringe';
 import { IAccountsRepository } from '../../repositories';
 import { NotFound } from '../../../../shared/errors/implementations';
 
@@ -6,6 +6,7 @@ interface IRequest {
   accountId: string;
 }
 
+@injectable()
 class GetProfileUseCase {
   constructor(
     @inject('AccountsRepository')

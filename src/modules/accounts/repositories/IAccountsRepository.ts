@@ -5,6 +5,7 @@ export type User = {
   email: string;
   name: string;
   birthday: Date;
+  socialUserId: string;
   avatar: string | null;
   deleted: boolean;
   createdAt: Date;
@@ -22,4 +23,6 @@ export interface IAccountsRepository {
   findByEmail(email: string): Promise<User | null>;
 
   findById(id: string, include?: IncludeType): Promise<User | null>;
+
+  findBySocialId(id: string): Promise<User | null>;
 }

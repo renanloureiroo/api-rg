@@ -7,6 +7,13 @@ import {
 } from '../../IAccountsRepository';
 
 class AccountsRepository implements IAccountsRepository {
+  findBySocialId(id: string): Promise<User | null> {
+    return prismaService.user.findFirst({
+      where: {
+        socialUserId: id,
+      },
+    });
+  }
   findByEmail(email: string): Promise<User | null> {
     console.log('EMAIL', email);
     return prismaService.user.findFirst({

@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { Unauthorized } from '../../../errors';
 import { googleOAuth } from '../../../container/providers/OAuth';
 import { AccountsRepository } from '../../../../modules/accounts/repositories/implementations';
+import { OAuth2Client } from 'google-auth-library';
 
 async function ensureAuthenticated(
   request: Request,
@@ -17,27 +18,40 @@ async function ensureAuthenticated(
 
     const [, token] = authorization.split(' ');
 
-    const tokenPayload = await googleOAuth.verify(token);
+    const googleOAuth = new OAuth2Client(
+      '984868387038-7ni62h613e8df34am1tv4pqfm5mf37dq.apps.googleusercontent.com'
+    );
+    const ticket = await googleOAuth.verifyIdToken({
+      idToken: token,
+    });
+    const tokenPayload = ticket.getPayload();
 
     if (!tokenPayload) {
-      throw new Unauthorized('Invalid token');
+      return response.status(401).json({
+        message: 'Invalid Token!',
+      });
     }
 
     const { sub } = tokenPayload;
 
     const accountsRepository = new AccountsRepository();
-    const user = await accountsRepository.findById(sub);
+    const user = await accountsRepository.findBySocialId(sub);
+    console.log('CRIOU RESPOSITORIO', user);
 
     if (!user) {
-      throw new Unauthorized('User does not exists');
+      return response.status(401).json({
+        message: 'User does not exists!',
+      });
     }
 
     request.user = {
-      id: sub,
+      id: user.id,
     };
     next();
   } catch (error) {
-    throw new Unauthorized('Invalid token');
+    return response.status(401).json({
+      message: 'Invalid Token!',
+    });
   }
 }
 

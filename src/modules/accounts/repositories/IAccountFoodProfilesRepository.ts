@@ -3,8 +3,8 @@ import { ICreateUserFoodProfilesDTO } from '../dtos/ICreateUserFoodProfilesDTO';
 
 export type FoodProfilesType = Prisma.BatchPayload;
 
-interface IFoodProfilesRepository {
+interface IAccountFoodProfilesRepository {
   createMany({ data }: ICreateUserFoodProfilesDTO): Promise<FoodProfilesType>;
 }
 
-export { IFoodProfilesRepository };
+export { IAccountFoodProfilesRepository };

@@ -1,10 +1,10 @@
 import { Prisma } from '@prisma/client';
 import { prismaService } from '../../../../../shared/infra/db/prisma/prismaService';
 
-import { IAllergiesRepository } from '../../IAllergiesRepository';
+import { IAccountAllergiesRepository } from '../../IAccountAllergiesRepository';
 import { ICreateUserAllergiesDTO } from '../../../dtos/ICreateUserAllergiesDTO';
 
-class AllergiesRepository implements IAllergiesRepository {
+class AccountAllergiesRepository implements IAccountAllergiesRepository {
   async createMany({
     data,
   }: ICreateUserAllergiesDTO): Promise<Prisma.BatchPayload> {
@@ -15,4 +15,4 @@ class AllergiesRepository implements IAllergiesRepository {
   }
 }
 
-export { AllergiesRepository };
+export { AccountAllergiesRepository };
