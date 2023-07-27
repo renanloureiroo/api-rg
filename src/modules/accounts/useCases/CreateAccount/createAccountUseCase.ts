@@ -11,6 +11,10 @@ import {
   IAccountsRepository,
 } from '../../repositories';
 
+interface IResponse {
+  created: boolean;
+}
+
 @injectable()
 class CreateAccountUseCase {
   constructor(
@@ -21,7 +25,7 @@ class CreateAccountUseCase {
     @inject('AccountFoodProfilesRepository')
     private readonly accountFoodProfilesRepository: IAccountFoodProfilesRepository
   ) {}
-  async execute(data: ICreateAccountDTO): Promise<void> {
+  async execute(data: ICreateAccountDTO): Promise<IResponse> {
     try {
       const accountAlreadyExists = await this.accountsRepository.findByEmail(
         data.email
@@ -31,7 +35,11 @@ class CreateAccountUseCase {
         accountAlreadyExists &&
         data.socialUserId === accountAlreadyExists.socialUserId;
 
-      if (accountAlreadyExistsWithSameSocialProvider) return;
+      if (accountAlreadyExistsWithSameSocialProvider) {
+        return {
+          created: false,
+        };
+      }
 
       if (accountAlreadyExists) {
         throw new Conflict('E-mail already used!');
@@ -57,7 +65,9 @@ class CreateAccountUseCase {
         });
       }
 
-      return;
+      return {
+        created: true,
+      };
     } catch (error) {
       throw error;
     }

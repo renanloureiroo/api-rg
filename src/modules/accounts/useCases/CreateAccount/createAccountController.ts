@@ -24,6 +24,10 @@ class CreateAccountController {
         birthday: new Date(data.birthday),
       });
 
+      if (!account.created) {
+        return response.status(200).json(account);
+      }
+
       return response.status(201).json(account);
     } catch (error) {
       throw error;

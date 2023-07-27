@@ -22,10 +22,14 @@ services:
       - 9229:9229
     volumes:
       - .:/usr/app
-    links:
-      - database
     depends_on:
       - database
+    links:
+      - database
+
+networks:
+  default:
+    driver: bridge
 
 volumes:
   pgdata:
